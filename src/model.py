@@ -172,7 +172,7 @@ class LatentDiscriminator(nn.Module):
         assert x.size()[1:] == (self.conv_in_fm, self.conv_in_sz, self.conv_in_sz)
         conv_output = self.conv_layers(x)
         assert conv_output.size() == (x.size(0), self.conv_out_fm, 1, 1)
-        return self.proj_layers(conv_output.view(x.size(0), self.conv_out_fm))
+        return nn.Tanh(self.proj_layers(conv_output.view(x.size(0), self.conv_out_fm)))
 
 
 class PatchDiscriminator(nn.Module):
@@ -243,7 +243,7 @@ class Classifier(nn.Module):
         assert x.size()[1:] == (self.img_fm, self.img_sz, self.img_sz)
         conv_output = self.conv_layers(x)
         assert conv_output.size() == (x.size(0), self.conv_out_fm, 1, 1)
-        return self.proj_layers(conv_output.view(x.size(0), self.conv_out_fm))
+        return nn.Tanh(self.proj_layers(conv_output.view(x.size(0), self.conv_out_fm)))
 
 
 def get_attr_loss(output, attributes, flip, params):
@@ -261,7 +261,8 @@ def get_attr_loss(output, attributes, flip, params):
             # generate different categories
             shift = torch.LongTensor(y.size()).random_(n_cat - 1) + 1
             y = (y + Variable(shift.cuda())) % n_cat
-        loss += F.cross_entropy(x, y)
+        loss += F.l1_loss(x,y)
+        #loss += F.cross_entropy(x, y)
         k += n_cat
     return loss
 

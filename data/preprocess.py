@@ -4,26 +4,35 @@ import matplotlib.image as mpimg
 import cv2
 import numpy as np
 import torch
-
+import glob
 
 N_IMAGES = 202599
 IMG_SIZE = 256
 IMG_PATH = 'images_%i_%i.pth' % (IMG_SIZE, IMG_SIZE)
 ATTR_PATH = 'attributes.pth'
-
-
+FOLDER = '~/rendering_materials/renders/renders_materials_manu/'
+FOLDER = '../../dataset/renders_by_geom_ldr/'
 def preprocess_images():
 
     if os.path.isfile(IMG_PATH):
         print("%s exists, nothing to do." % IMG_PATH)
         return
 
-    print("Reading images from img_align_celeba/ ...")
+    attr_lines = [line.rstrip() for line in open(FOLDER+'attributes_dataset.txt', 'r')]
+    N_IMAGES=len(attr_lines)-1
+
+    imgs=[FOLDER+'256px_dataset/'+line.split('\t',1)[0] for line in attr_lines[1:]]
+
+
+    # print("Reading images from img_align_celeba/ ...")
+    # imgs=glob.glob(FOLDER+'/256px_dataset/*')
+    N_IMAGES=len(imgs)
+    print(N_IMAGES)
     raw_images = []
-    for i in range(1, N_IMAGES + 1):
+    for i in range(0, N_IMAGES):
         if i % 10000 == 0:
             print(i)
-        raw_images.append(mpimg.imread('img_align_celeba/%06i.jpg' % i)[20:-20])
+        raw_images.append(mpimg.imread(imgs[i]))
 
     if len(raw_images) != N_IMAGES:
         raise Exception("Found %i images. Expected %i" % (len(raw_images), N_IMAGES))
@@ -33,7 +42,7 @@ def preprocess_images():
     for i, image in enumerate(raw_images):
         if i % 10000 == 0:
             print(i)
-        assert image.shape == (178, 178, 3)
+        #assert image.shape == (178, 178, 3)
         if IMG_SIZE < 178:
             image = cv2.resize(image, (IMG_SIZE, IMG_SIZE), interpolation=cv2.INTER_AREA)
         elif IMG_SIZE > 178:
@@ -56,20 +65,22 @@ def preprocess_attributes():
         print("%s exists, nothing to do." % ATTR_PATH)
         return
 
-    attr_lines = [line.rstrip() for line in open('list_attr_celeba.txt', 'r')]
-    assert len(attr_lines) == N_IMAGES + 2
+    attr_lines = [line.rstrip() for line in open(FOLDER+'attributes_dataset.txt', 'r')]
+    print(len(attr_lines))
+    #assert len(attr_lines) == N_IMAGES + 1
 
-    attr_keys = attr_lines[1].split()
+    attr_keys = attr_lines[0].split()
+    print (attr_keys)
     attributes = {k: np.zeros(N_IMAGES, dtype=np.bool) for k in attr_keys}
 
-    for i, line in enumerate(attr_lines[2:]):
+    for i, line in enumerate(attr_lines[1:]):
         image_id = i + 1
         split = line.split()
-        assert len(split) == 41
-        assert split[0] == ('%06i.jpg' % image_id)
-        assert all(x in ['-1', '1'] for x in split[1:])
+        assert len(split) == len(attr_keys)+1
+        #assert split[0] == ('%06i.jpg' % image_id)
+        #assert all(x in ['-1', '1'] for x in split[1:])
         for j, value in enumerate(split[1:]):
-            attributes[attr_keys[j]][i] = value == '1'
+            attributes[attr_keys[j]][i] = float(value)*2-1
 
     print("Saving attributes to %s ..." % ATTR_PATH)
     torch.save(attributes, ATTR_PATH)
