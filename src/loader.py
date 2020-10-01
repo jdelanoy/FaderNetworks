@@ -25,6 +25,7 @@ AVAILABLE_ATTR = [
     "Wavy_Hair", "Wearing_Earrings", "Wearing_Hat", "Wearing_Lipstick",
     "Wearing_Necklace", "Wearing_Necktie", "Young"
 ]
+AVAILABLE_ATTR = ['glossy', "metallic", "rough"]
 
 DATA_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data')
 
@@ -59,7 +60,8 @@ def load_images(params):
     attrs = []
     for name, n_cat in params.attr:
         for i in range(n_cat):
-            attrs.append(torch.FloatTensor((attributes[name] == i).astype(np.float32)))
+            #attrs.append(torch.FloatTensor((attributes[name] == i).astype(np.float32)))
+            attrs.append(torch.FloatTensor((attributes[name]).astype(np.float32)))
     attributes = torch.cat([x.unsqueeze(1) for x in attrs], 1)
     # split train / valid / test
     if params.debug:
@@ -70,12 +72,12 @@ def load_images(params):
         train_index = 162770
         valid_index = 162770 + 19867
         test_index = len(images)
-    train_images = images[:train_index]
-    valid_images = images[train_index:valid_index]
-    test_images = images[valid_index:test_index]
-    train_attributes = attributes[:train_index]
-    valid_attributes = attributes[train_index:valid_index]
-    test_attributes = attributes[valid_index:test_index]
+    train_images = images[985:]
+    valid_images = images[:992]
+    test_images = images[:992]
+    train_attributes = attributes[985:]
+    valid_attributes = attributes[:992]
+    test_attributes = attributes[:992]
     # log dataset statistics / return dataset
     logger.info('%i / %i / %i images with attributes for train / valid / test sets'
                 % (len(train_images), len(valid_images), len(test_images)))
