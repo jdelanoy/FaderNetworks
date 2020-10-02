@@ -68,7 +68,7 @@ def attr_flag(s):
     attributes = []
     for x in attr:
         if '.' not in x:
-            attributes.append((x, 2))
+            attributes.append((x, 1))
         else:
             split = x.split('.')
             assert len(split) == 2 and len(split[0]) > 0
@@ -84,7 +84,7 @@ def check_attr(params):
     if params.attr == '*':
         params.attr = attr_flag(','.join(AVAILABLE_ATTR))
     else:
-        assert all(name in AVAILABLE_ATTR and n_cat >= 2 for name, n_cat in params.attr)
+        assert all(name in AVAILABLE_ATTR and n_cat >= 1 for name, n_cat in params.attr)
     params.n_attr = sum([n_cat for _, n_cat in params.attr])
 
 

@@ -63,10 +63,11 @@ def preprocess_attributes():
 
     if os.path.isfile(ATTR_PATH):
         print("%s exists, nothing to do." % ATTR_PATH)
-        return
+        #return
 
     attr_lines = [line.rstrip() for line in open(FOLDER+'attributes_dataset.txt', 'r')]
     print(len(attr_lines))
+    N_IMAGES=len(attr_lines)-1
     #assert len(attr_lines) == N_IMAGES + 1
 
     attr_keys = attr_lines[0].split()
@@ -81,7 +82,7 @@ def preprocess_attributes():
         #assert all(x in ['-1', '1'] for x in split[1:])
         for j, value in enumerate(split[1:]):
             attributes[attr_keys[j]][i] = float(value)*2-1
-
+    #print(len(attributes['glossy']))
     print("Saving attributes to %s ..." % ATTR_PATH)
     torch.save(attributes, ATTR_PATH)
 

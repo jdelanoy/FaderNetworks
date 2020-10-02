@@ -35,6 +35,7 @@ def log_attributes_stats(train_attributes, valid_attributes, test_attributes, pa
     Log attributes distributions.
     """
     k = 0
+    #print(train_attributes.size())
     for (attr_name, n_cat) in params.attr:
         logger.debug('Train %s: %s' % (attr_name, ' / '.join(['%.5f' % train_attributes[:, k + i].mean() for i in range(n_cat)])))
         logger.debug('Valid %s: %s' % (attr_name, ' / '.join(['%.5f' % valid_attributes[:, k + i].mean() for i in range(n_cat)])))
@@ -58,10 +59,13 @@ def load_images(params):
 
     # parse attributes
     attrs = []
+    #print(len(attributes['glossy']))
     for name, n_cat in params.attr:
-        for i in range(n_cat):
+        #print(name,n_cat)
+        #for i in range(n_cat):
             #attrs.append(torch.FloatTensor((attributes[name] == i).astype(np.float32)))
-            attrs.append(torch.FloatTensor((attributes[name]).astype(np.float32)))
+        attrs.append(torch.FloatTensor((attributes[name]).astype(np.float32)))
+    #print(len(attrs))
     attributes = torch.cat([x.unsqueeze(1) for x in attrs], 1)
     # split train / valid / test
     if params.debug:

@@ -257,10 +257,10 @@ def get_attr_loss(output, attributes, flip, params):
         # categorical
         x = output[:, k:k + n_cat].contiguous()
         y = attributes[:, k:k + n_cat].max(1)[1].view(-1)
-        if flip:
-            # generate different categories
-            shift = torch.LongTensor(y.size()).random_(n_cat - 1) + 1
-            y = (y + Variable(shift.cuda())) % n_cat
+        # if flip:
+        #     # generate different categories
+        #     shift = torch.LongTensor(y.size()).random_(n_cat - 1) + 1
+        #     y = (y + Variable(shift.cuda())) % n_cat
         loss += F.l1_loss(x,y)
         #loss += F.cross_entropy(x, y)
         k += n_cat
