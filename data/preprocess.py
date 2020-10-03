@@ -10,8 +10,8 @@ N_IMAGES = 202599
 IMG_SIZE = 256
 IMG_PATH = 'images_%i_%i.pth' % (IMG_SIZE, IMG_SIZE)
 ATTR_PATH = 'attributes.pth'
-FOLDER = '~/rendering_materials/renders/renders_materials_manu/'
-FOLDER = '../../dataset/renders_by_geom_ldr/'
+FOLDER = '/home/jdelanoy/rendering_materials/renders/renders_materials_manu/'
+#FOLDER = '../../dataset/renders_by_geom_ldr/'
 def preprocess_images():
 
     if os.path.isfile(IMG_PATH):

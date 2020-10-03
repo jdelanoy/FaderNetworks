@@ -270,7 +270,7 @@ def classifier_step(classifier, optimizer, data, params, costs):
     preds = classifier(batch_x)
     # loss / optimize
     loss = get_attr_loss(preds, batch_y, False, params)
-    costs.append(loss.data[0])
+    costs.append(loss.item())
     optimizer.zero_grad()
     loss.backward()
     if params.clip_grad_norm:

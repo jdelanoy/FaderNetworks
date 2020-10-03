@@ -236,7 +236,8 @@ class Classifier(nn.Module):
         self.proj_layers = nn.Sequential(
             nn.Linear(self.conv_out_fm, self.hid_dim),
             nn.LeakyReLU(0.2, inplace=True),
-            nn.Linear(self.hid_dim, self.n_attr)
+            nn.Linear(self.hid_dim, self.n_attr),
+            nn.Tanh()
         )
 
     def forward(self, x):
@@ -244,26 +245,34 @@ class Classifier(nn.Module):
         conv_output = self.conv_layers(x)
         assert conv_output.size() == (x.size(0), self.conv_out_fm, 1, 1)
         out=self.proj_layers(conv_output.view(x.size(0), self.conv_out_fm))
-        print(out.size())
-        return nn.Tanh(out)
+        return out
 
 
 def get_attr_loss(output, attributes, flip, params):
     """
     Compute attributes loss.
     """
+    #print(output.size())
+    #print(attributes.size())
     assert type(flip) is bool
     k = 0
+    loss = F.l1_loss(output,attributes)
+    #print(loss)
+    return loss
+
     loss = 0
     for (_, n_cat) in params.attr:
         # categorical
         x = output[:, k:k + n_cat].contiguous()
-        y = attributes[:, k:k + n_cat].max(1)[1].view(-1)
+        y = attributes[:, k:k + n_cat]#.max(1)[1].view(-1)
         # if flip:
         #     # generate different categories
         #     shift = torch.LongTensor(y.size()).random_(n_cat - 1) + 1
-        #     y = (y + Variable(shift.cuda())) % n_cat
+        #     y = (y + Variable(shift.cuda())) % n_cat 
+        print(x.size())
+        print(y.size())
         loss += F.l1_loss(x,y)
+        print(loss.size())
         #loss += F.cross_entropy(x, y)
         k += n_cat
     return loss
