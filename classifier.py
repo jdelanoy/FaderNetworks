@@ -112,9 +112,9 @@ for n_epoch in range(params.n_epochs):
     # log classifier accuracy
     log_accu = [('valid_accu', np.mean(valid_accu)), ('test_accu', np.mean(test_accu))]
     for accu, (name, _) in zip(valid_accu, params.attr):
-        log_accu.append(('valid_accu_%s' % name, accu))
+        log_accu.append(('valid_accu_%s' % name, accu.astype(float)))
     for accu, (name, _) in zip(test_accu, params.attr):
-        log_accu.append(('test_accu_%s' % name, accu))
+        log_accu.append(('test_accu_%s' % name, accu.astype(float)))
     logger.info('Classifier accuracy:')
     print_accuracies(log_accu)
 
