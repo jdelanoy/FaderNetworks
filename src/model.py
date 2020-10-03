@@ -269,10 +269,10 @@ def get_attr_loss(output, attributes, flip, params):
         #     # generate different categories
         #     shift = torch.LongTensor(y.size()).random_(n_cat - 1) + 1
         #     y = (y + Variable(shift.cuda())) % n_cat 
-        print(x.size())
-        print(y.size())
+        #print(x.size())
+        #print(y.size())
         loss += F.l1_loss(x,y)
-        print(loss.size())
+        #print(loss.size())
         #loss += F.cross_entropy(x, y)
         k += n_cat
     return loss
@@ -285,9 +285,11 @@ def update_predictions(all_preds, preds, targets, params):
     assert len(all_preds) == len(params.attr)
     k = 0
     for j, (_, n_cat) in enumerate(params.attr):
-        _preds = preds[:, k:k + n_cat].max(1)[1]
-        _targets = targets[:, k:k + n_cat].max(1)[1]
-        all_preds[j].extend((_preds == _targets).tolist())
+
+        _preds = preds[:, k:k + n_cat]#.max(1)[1]
+        _targets = targets[:, k:k + n_cat]#.max(1)[1]
+        #all_preds[j].extend((_preds == _targets).tolist())
+        all_preds[j].extend(np.abs(_preds-_targets))
         k += n_cat
     assert k == params.n_attr
 

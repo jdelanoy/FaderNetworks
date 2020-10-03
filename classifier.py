@@ -102,7 +102,7 @@ for n_epoch in range(params.n_epochs):
 
         # average loss
         if len(costs) >= 25:
-            logger.info('%06i - Classifier loss: %.5f' % (n_iter, np.mean(costs)))
+            logger.info('%06i - Classifier loss: %f' % (n_iter, np.mean(costs)))
             del costs[:]
 
     # compute accuracy

@@ -7,6 +7,7 @@
 
 import os
 import re
+import time
 import pickle
 import random
 import inspect
@@ -179,13 +180,15 @@ def get_dump_path(params):
     if not os.path.exists(sweep_path):
         subprocess.Popen("mkdir %s" % sweep_path, shell=True).wait()
 
-    # create a random name for the experiment
-    chars = 'abcdefghijklmnopqrstuvwxyz0123456789'
-    while True:
-        exp_id = ''.join(random.choice(chars) for _ in range(10))
-        dump_path = os.path.join(MODELS_PATH, params.name, exp_id)
-        if not os.path.isdir(dump_path):
-            break
+    # # create a random name for the experiment
+    # chars = 'abcdefghijklmnopqrstuvwxyz0123456789'
+    # while True:
+    #     exp_id = ''.join(random.choice(chars) for _ in range(10))
+    #     dump_path = os.path.join(MODELS_PATH, params.name, exp_id)
+    #     if not os.path.isdir(dump_path):
+    #         break
+    exp_id=time.strftime("%Y-%m-%d-%H:%M:%S", time.localtime())
+    dump_path = os.path.join(MODELS_PATH, params.name, exp_id)
 
     # create the dump folder
     if not os.path.isdir(dump_path):
@@ -235,7 +238,7 @@ def print_accuracies(values):
     """
     assert all(len(x) == 2 for x in values)
     for name, value in values:
-        logger.info('{:<20}: {:>6}'.format(name, '%.3f%%' % (100 * value)))
+        logger.info('{:<20}: {:>6}'.format(name, '%f' % (100 * value)))
     logger.info('')
 
 
