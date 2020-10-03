@@ -238,7 +238,7 @@ def print_accuracies(values):
     """
     assert all(len(x) == 2 for x in values)
     for name, value in values:
-        logger.info('{:<20}: {:>6}'.format(name, '%f' % (100 * value)))
+        logger.info('{:<20}: {:>6}'.format(name, '%e' % (100 * value)))
     logger.info('')
 
 

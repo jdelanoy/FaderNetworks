@@ -165,14 +165,15 @@ class LatentDiscriminator(nn.Module):
         self.proj_layers = nn.Sequential(
             nn.Linear(self.conv_out_fm, self.hid_dim),
             nn.LeakyReLU(0.2, inplace=True),
-            nn.Linear(self.hid_dim, self.n_attr)
+            nn.Linear(self.hid_dim, self.n_attr),
+            nn.Tanh()
         )
 
     def forward(self, x):
         assert x.size()[1:] == (self.conv_in_fm, self.conv_in_sz, self.conv_in_sz)
         conv_output = self.conv_layers(x)
         assert conv_output.size() == (x.size(0), self.conv_out_fm, 1, 1)
-        return nn.Tanh(self.proj_layers(conv_output.view(x.size(0), self.conv_out_fm)))
+        return self.proj_layers(conv_output.view(x.size(0), self.conv_out_fm))
 
 
 class PatchDiscriminator(nn.Module):

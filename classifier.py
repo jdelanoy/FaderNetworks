@@ -102,7 +102,7 @@ for n_epoch in range(params.n_epochs):
 
         # average loss
         if len(costs) >= 25:
-            logger.info('%06i - Classifier loss: %f' % (n_iter, np.mean(costs)))
+            logger.info('%06i - Classifier loss: %e' % (n_iter, np.mean(costs)))
             del costs[:]
 
     # compute accuracy
@@ -119,12 +119,12 @@ for n_epoch in range(params.n_epochs):
     print_accuracies(log_accu)
 
     # JSON log
-    logger.debug("__log__:%s" % json.dumps(dict([('n_epoch', n_epoch)] + log_accu)))
+    #logger.debug("__log__:%s" % json.dumps(dict([('n_epoch', n_epoch)] + log_accu)))
 
     # save best or periodic model
     if np.mean(valid_accu) > best_accu:
         best_accu = np.mean(valid_accu)
-        logger.info('Best validation average accuracy: %.5f' % best_accu)
+        logger.info('Best validation average accuracy: %e' % best_accu)
         save_model('best')
     elif n_epoch % 10 == 0 and n_epoch > 0:
         save_model('periodic-%i' % n_epoch)
