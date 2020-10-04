@@ -266,10 +266,11 @@ def get_attr_loss(output, attributes, flip, params):
         # categorical
         x = output[:, k:k + n_cat].contiguous()
         y = attributes[:, k:k + n_cat]#.max(1)[1].view(-1)
-        # if flip:
-        #     # generate different categories
-        #     shift = torch.LongTensor(y.size()).random_(n_cat - 1) + 1
-        #     y = (y + Variable(shift.cuda())) % n_cat 
+        if flip:
+            # generate different categories
+            #shift = torch.LongTensor(y.size()).random_(n_cat - 1) + 1
+            #y = (y + Variable(shift.cuda())) % n_cat 
+            y=y+ torch.randn_like(c_trg[:, i])*0.5 #clever way of doing it
         #print(x.size())
         #print(y.size())
         loss += F.l1_loss(x,y)
@@ -303,7 +304,7 @@ def get_mappings(params):
         mappings = []
         k = 0
         for (_, n_cat) in params.attr:
-            assert n_cat >= 2
+            #assert n_cat >= 2
             mappings.append((k, k + n_cat))
             k += n_cat
         assert k == params.n_attr
@@ -322,13 +323,14 @@ def flip_attributes(attributes, params, attribute_id, new_value=None):
     def flip_attribute(attribute_id, new_value=None):
         bs = attributes.size(0)
         i, j = mappings[attribute_id]
-        attributes[:, i:j].zero_()
-        if new_value is None:
-            y = torch.LongTensor(bs).random_(j - i)
-        else:
-            assert new_value in range(j - i)
-            y = torch.LongTensor(bs).fill_(new_value)
-        attributes[:, i:j].scatter_(1, y.unsqueeze(1), 1)
+        # attributes[:, i:j].zero_()
+        # if new_value is None:
+        #     y = torch.LongTensor(bs).random_(j - i)
+        # else:
+        #     assert new_value in range(j - i)
+        #     y = torch.LongTensor(bs).fill_(new_value)
+        # attributes[:, i:j].scatter_(1, y.unsqueeze(1), 1)
+        attributes[:, i:j]=torch.rand_like()*2-1
 
     if attribute_id == 'all':
         assert new_value is None

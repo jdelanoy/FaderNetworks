@@ -97,7 +97,7 @@ class Trainer(object):
         preds = self.lat_dis(Variable(enc_outputs[-1 - params.n_skip].data))
         # loss / optimize
         loss = get_attr_loss(preds, batch_y, False, params)
-        self.stats['lat_dis_costs'].append(loss.data[0])
+        self.stats['lat_dis_costs'].append(loss.item())
         self.lat_dis_optimizer.zero_grad()
         loss.backward()
         if params.clip_grad_norm:
