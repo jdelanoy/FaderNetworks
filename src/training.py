@@ -73,6 +73,7 @@ class Trainer(object):
         # training statistics
         self.stats = {}
         self.stats['rec_costs'] = []
+        self.stats['ae_lat_dis_cost'] = []
         self.stats['lat_dis_costs'] = []
         self.stats['ptc_dis_costs'] = []
         self.stats['clf_dis_costs'] = []
@@ -124,7 +125,7 @@ class Trainer(object):
         # loss / optimize
         loss = F.binary_cross_entropy(real_preds, 1 - y_fake)
         loss += F.binary_cross_entropy(fake_preds, y_fake)
-        self.stats['ptc_dis_costs'].append(loss.data[0])
+        self.stats['ptc_dis_costs'].append(loss.item())
         self.ptc_dis_optimizer.zero_grad()
         loss.backward()
         if params.clip_grad_norm:
@@ -144,7 +145,7 @@ class Trainer(object):
         preds = self.clf_dis(batch_x)
         # loss / optimize
         loss = get_attr_loss(preds, batch_y, False, params)
-        self.stats['clf_dis_costs'].append(loss.data[0])
+        self.stats['clf_dis_costs'].append(loss.item())
         self.clf_dis_optimizer.zero_grad()
         loss.backward()
         if params.clip_grad_norm:
@@ -171,12 +172,13 @@ class Trainer(object):
         enc_outputs, dec_outputs = self.ae(batch_x, batch_y)
         # autoencoder loss from reconstruction
         loss = params.lambda_ae * ((batch_x - dec_outputs[-1]) ** 2).mean()
-        self.stats['rec_costs'].append(loss.data[0])
+        self.stats['rec_costs'].append(loss.item())
         # encoder loss from the latent discriminator
         if params.lambda_lat_dis:
             lat_dis_preds = self.lat_dis(enc_outputs[-1 - params.n_skip])
             lat_dis_loss = get_attr_loss(lat_dis_preds, batch_y, True, params)
             loss = loss + get_lambda(params.lambda_lat_dis, params) * lat_dis_loss
+            self.stats['ae_lat_dis_cost'].append(loss.item())
         # decoding with random labels
         if params.lambda_ptc_dis + params.lambda_clf_dis > 0:
             flipped = flip_attributes(batch_y, params, 'all')
@@ -215,6 +217,8 @@ class Trainer(object):
                 ('Patch discriminator', 'ptc_dis_costs'),
                 ('Classifier discriminator', 'clf_dis_costs'),
                 ('Reconstruction loss', 'rec_costs'),
+                ('AE latent loss', 'ae_lat_dis_cost'),
+                
             ]
             logger.info(('%06i - ' % n_iter) +
                         ' / '.join(['%s : %.5f' % (a, np.mean(self.stats[b]))
