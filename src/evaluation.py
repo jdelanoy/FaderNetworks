@@ -150,8 +150,8 @@ class Evaluator(object):
                     flipped = flip_attributes(batch_y, params, j, new_value=value)
                     dec_outputs = self.ae.decode(enc_outputs, flipped)
                     # classify
-                    clf_preds = self.eval_clf(dec_outputs[-1])[:, idx[j]:idx[j] + n_cat].max(1)[1].view(-1)
-                    all_preds[k].extend((clf_preds.data.cpu() == value).tolist())
+                    clf_preds = self.eval_clf(dec_outputs[-1])[:, idx[j]:idx[j] + n_cat]#.max(1)[1].view(-1)
+                    all_preds[k].extend(np.abs(clf_preds-flipped[:, idx[j]:idx[j] + n_cat]))
                     k += 1
             assert k == params.n_attr
 
